@@ -51,6 +51,7 @@ public class JWTTokenValidatorFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
+        //if dologin, så ikke kør validate. ellers kør validate. (hvad med register)
         return request.getServletPath().equals("/dologin");
     }
 

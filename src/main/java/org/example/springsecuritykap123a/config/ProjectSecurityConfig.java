@@ -6,9 +6,12 @@ import org.example.springsecuritykap123a.filter.JWTTokenGeneratorFilter;
 import org.example.springsecuritykap123a.filter.JWTTokenValidatorFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -46,10 +49,10 @@ public class ProjectSecurityConfig {
                 .addFilterAfter(new JWTTokenGeneratorFilter(), BasicAuthenticationFilter.class)
                 .addFilterBefore(new JWTTokenValidatorFilter(), BasicAuthenticationFilter.class)
                 .authorizeHttpRequests((requests)->requests
-                        .requestMatchers("/myAccount").hasRole("SALES")
-                        .requestMatchers("/myBalance").hasAnyRole("SALES","ADMIN")
-                        .requestMatchers("/myLoans").hasRole("USER")
-                        .requestMatchers("/myCards").hasRole("USER")
+                        .requestMatchers("/myAccount").hasRole("ADMIN")
+                        .requestMatchers("/myBalance").hasAnyRole("USER","ADMIN")
+                        .requestMatchers("/myLoans").hasRole("ADMIN")
+                        .requestMatchers("/myCards").hasRole("ADMIN")
                         .requestMatchers("/user").authenticated()
                         .requestMatchers("/notices","/contact","/register","login","/dologin").permitAll())
                 .formLogin(Customizer.withDefaults())
@@ -59,10 +62,16 @@ public class ProjectSecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        //BCryptPasswordEncoder
-        var obj = PasswordEncoderFactories.createDelegatingPasswordEncoder();
+        var obj = PasswordEncoderFactories.createDelegatingPasswordEncoder(); //click for at se liste af password algoritmer
         return obj;
-        //return NoOpPasswordEncoder.getInstance();
+        //return new BCryptPasswordEncoder();  mest normale, kan tage parameter der øger sikkerhed
+        //return new BCryptPasswordEncoder(5);  giver højere strenght.
+        //return NoOpPasswordEncoder.getInstance(); ingen kryptering
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
     }
 
 }

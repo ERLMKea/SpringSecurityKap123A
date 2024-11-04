@@ -38,14 +38,13 @@ public class JWTTokenGeneratorFilter extends OncePerRequestFilter {
             response.setHeader(SecurityConstants.JWT_HEADER, jwt);
             System.out.println(jwt);
         }
-
         filterChain.doFilter(request, response);
     }
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
-        //return !request.getServletPath().equals("/dologin");
-        return !request.getServletPath().equals("/myBalance");
+        return !request.getServletPath().equals("/dologin");
+        //return !request.getServletPath().equals("/myBalance");
     }
 
     private String populateAuthorities(Collection<? extends GrantedAuthority> collection) {
